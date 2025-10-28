@@ -96,11 +96,13 @@ class DataIterableAnnotationReader
                 str_replace('[]', '', $arrayType)
             );
 
+            $isReturnType = str_contains($arrayMatches['kind'][0] ?? '', '@return');
+
             $annotations[] = new DataIterableAnnotation(
                 type: $resolvedTuple['type'],
                 isData: $resolvedTuple['isData'],
                 property: empty($parameter) ? null : $parameter,
-                isReturnType: $arrayMatches['kind'] === 'return',
+                isReturnType: $isReturnType,
             );
         }
 
@@ -119,12 +121,14 @@ class DataIterableAnnotationReader
 
             $resolvedTuple = $this->resolveDataClass($reflection, $dataClass);
 
+            $isReturnType = str_contains($collectionMatches['kind'][0] ?? '', '@return');
+
             $annotations[] = new DataIterableAnnotation(
                 type: $resolvedTuple['type'],
                 isData: $resolvedTuple['isData'],
                 keyType: empty($key) ? 'array-key' : $key,
                 property: empty($parameter) ? null : $parameter,
-                isReturnType: $collectionMatches['kind'] === 'return',
+                isReturnType: $isReturnType,
             );
         }
 
