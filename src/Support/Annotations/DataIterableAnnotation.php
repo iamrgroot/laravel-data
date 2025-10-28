@@ -9,6 +9,7 @@ class DataIterableAnnotation
         public bool $isData,
         public string $keyType = 'array-key',
         public ?string $property = null,
+        public bool $isReturnType = false,
     ) {
     }
 }

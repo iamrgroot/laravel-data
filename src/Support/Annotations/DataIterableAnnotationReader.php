@@ -49,20 +49,20 @@ class DataIterableAnnotationReader
 
         $comment = str_replace('?', '', $comment);
 
-        $kindPattern = '(?:@property|@var|@param)\s*';
+        $kindPattern = '(?:@property|@var|@param|@return)\s*';
         $fqsenPattern = '[\\\\\\p{L}0-9_\|]+';
         $typesPattern = '[\\\\\\p{L}0-9_\\|\\[\\]]+';
         $keyPattern = '(?<key>int|string|int\|string|string\|int|array-key)';
         $parameterPattern = '\s*\$?(?<parameter>[\\p{L}0-9_]+)?';
 
         preg_match_all(
-            "/{$kindPattern}(?<types>{$typesPattern}){$parameterPattern}/ui",
+            "/(?<kind>{$kindPattern})(?<types>{$typesPattern}){$parameterPattern}/ui",
             $comment,
             $arrayMatches,
         );
 
         preg_match_all(
-            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>(?:{$typesPattern})*{$parameterPattern}/ui",
+            "/(?<kind>{$kindPattern})(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>(?:{$typesPattern})*{$parameterPattern}/ui",
             $comment,
             $collectionMatches,
         );
@@ -99,7 +99,8 @@ class DataIterableAnnotationReader
             $annotations[] = new DataIterableAnnotation(
                 type: $resolvedTuple['type'],
                 isData: $resolvedTuple['isData'],
-                property: empty($parameter) ? null : $parameter
+                property: empty($parameter) ? null : $parameter,
+                isReturnType: $arrayMatches['kind'] === 'return',
             );
         }
 
@@ -122,7 +123,8 @@ class DataIterableAnnotationReader
                 type: $resolvedTuple['type'],
                 isData: $resolvedTuple['isData'],
                 keyType: empty($key) ? 'array-key' : $key,
-                property: empty($parameter) ? null : $parameter
+                property: empty($parameter) ? null : $parameter,
+                isReturnType: $collectionMatches['kind'] === 'return',
             );
         }
 
